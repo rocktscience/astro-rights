@@ -17,7 +17,7 @@ export default function PublishersPage() {
 
   const filteredPublishers = publishers.filter(
     (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      (p.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
       p.ipiNameNumber?.includes(search)
   );
 
@@ -64,9 +64,9 @@ export default function PublishersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {filteredPublishers.map((publisher) => (
+              {filteredPublishers.map((publisher, idx) => (
                 <motion.tr
-                  key={publisher.id}
+                  key={`${publisher.id ?? publisher.publisherId ?? publisher.name ?? 'publisher'}-${idx}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="group hover:bg-white/[0.02] transition-colors"

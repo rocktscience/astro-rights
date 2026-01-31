@@ -12,6 +12,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+      // Next's overlay can sometimes show `undefined`; log the real reason.
+      console.error('Unhandled promise rejection:', event.reason);
+    };
+    window.addEventListener('unhandledrejection', onUnhandledRejection);
+    return () => window.removeEventListener('unhandledrejection', onUnhandledRejection);
+  }, []);
+
+  useEffect(() => {
     if (mounted) {
       document.documentElement.classList.toggle('dark', theme === 'dark');
     }

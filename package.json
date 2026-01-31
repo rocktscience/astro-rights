@@ -1,10 +1,11 @@
 {
-  "name": "rocket-science-publisher",
+  "name": "astro-rights",
   "version": "1.0.0",
   "description": "Modern Music Publishing & Royalty Management Platform with CWR Generation",
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:webpack": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -13,12 +14,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/file-saver": "^2.0.7",
-    "@types/node": "^25.0.10",
-    "@types/papaparse": "^5.5.2",
-    "@types/react": "^19.2.10",
-    "@types/react-dom": "^19.2.3",
-    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.23",
     "basic-ftp": "^5.1.0",
     "clsx": "^2.1.1",
@@ -36,5 +31,13 @@
     "typescript": "^5.9.3",
     "uuid": "^13.0.0",
     "zustand": "^5.0.10"
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.7",
+    "@types/node": "^20.11.30",
+    "@types/papaparse": "^5.5.2",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@types/uuid": "^9.0.8"
   }
 }

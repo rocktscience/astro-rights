@@ -37,9 +37,9 @@ export interface Toast {
 
 // Sample societies data
 const SOCIETIES: Society[] = [
-  { id: '1', code: '021', name: 'ASCAP', territory: 'US', type: 'PRO' },
+  { id: '1', code: '010', name: 'ASCAP', territory: 'US', type: 'PRO' },
   { id: '2', code: '021', name: 'BMI', territory: 'US', type: 'PRO' },
-  { id: '3', code: '021', name: 'SESAC', territory: 'US', type: 'PRO' },
+  { id: '3', code: '071', name: 'SESAC', territory: 'US', type: 'PRO' },
   { id: '4', code: '034', name: 'PRS', territory: 'GB', type: 'PRO' },
   { id: '5', code: '058', name: 'SACEM', territory: 'FR', type: 'PRO' },
   { id: '6', code: '035', name: 'GEMA', territory: 'DE', type: 'PRO' },
@@ -59,6 +59,7 @@ interface MusicPublisherStore {
   // Sidebar
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
+  toggleSidebar: () => void;
   
   // Toasts
   toasts: Toast[];
@@ -272,6 +273,7 @@ export const useStore = create<MusicPublisherStore>()(
       // Sidebar
       sidebarCollapsed: false,
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+      toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       
       // Toasts
       toasts: [],

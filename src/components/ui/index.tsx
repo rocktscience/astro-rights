@@ -299,8 +299,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             )}
             {...props}
           >
-            {options.map((option) => (
-              <option key={option.value} value={option.value} className="bg-zinc-900">
+            {options.map((option, idx) => (
+              <option key={`${option.value}-${idx}`} value={option.value} className="bg-zinc-900">
                 {option.label}
               </option>
             ))}
