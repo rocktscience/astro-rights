@@ -144,11 +144,17 @@ export default function PublishersPage() {
               role: (form.elements.namedItem('role') as HTMLSelectElement).value as Publisher['role'],
               isControlled: (form.elements.namedItem('controlled') as HTMLInputElement).checked,
             };
+            const dataWithDefaults = {
+              // Required-by-store fields (draft-safe defaults)
+              publisherId: '',
+              publishingShareIds: [],
+              ...data,
+            };
             if (editingPublisher) {
               updatePublisher(editingPublisher.id, data);
               addToast({ type: 'success', title: 'Publisher updated' });
             } else {
-              addPublisher(data);
+              addPublisher(dataWithDefaults as any);
               addToast({ type: 'success', title: 'Publisher added' });
             }
             setShowModal(false);

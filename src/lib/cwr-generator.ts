@@ -79,7 +79,9 @@ const generateNWRorREV = (ctx: CWRContext, work: Work): string => {
   const copyrightNumber = ljust('', 12);
   const musicalWorkDistributionCategory = ljust(work.musicalWorkDistributionCategory || 'UNC', 3);
   const recordings = work.recordings || [];
-  const duration = formatDuration(recordings[0]?.duration);
+  const duration = formatDuration(
+    recordings[0]?.duration != null ? Number(recordings[0]?.duration) : undefined
+  );
   const recordedIndicator = recordings.length > 0 ? 'Y' : 'U';
   const textMusicRelationship = 'MTX';
   const compositeType = ljust('', 3);
@@ -156,7 +158,7 @@ const generateSWR = (ctx: CWRContext, share: WriterShare, writerSeq: number): st
   const transactionSeq = rjust(ctx.transactionSequence, 8);
   const recordSeq = rjust(ctx.recordSequence, 8);
   const interestedPartyNum = ljust(`W${writerSeq}`, 9);
-  const writerLastName = ljust(share.writer?.lastName.toUpperCase() || '', 45);
+  const writerLastName = ljust((share.writer?.lastName ?? '').toUpperCase(), 45);
   const writerFirstName = ljust(share.writer?.firstName?.toUpperCase() || '', 30);
   const writerDesignation = share.writer?.isControlled ? 'CA' : 'A ';
   const taxId = ljust('', 9);
@@ -198,7 +200,7 @@ const generateOWR = (ctx: CWRContext, share: WriterShare, writerSeq: number): st
   const transactionSeq = rjust(ctx.transactionSequence, 8);
   const recordSeq = rjust(ctx.recordSequence, 8);
   const interestedPartyNum = ljust(`W${writerSeq}`, 9);
-  const writerLastName = ljust(share.writer?.lastName.toUpperCase() || '', 45);
+  const writerLastName = ljust((share.writer?.lastName ?? '').toUpperCase(), 45);
   const writerFirstName = ljust(share.writer?.firstName?.toUpperCase() || '', 30);
   const writerUnknown = ' ';
   const writerDesignation = ljust(share.capacity || 'CA', 2);
@@ -370,10 +372,10 @@ export const generateCWR = (
       for (const recording of work.recordings) {
         for (const artist of recording.artists || []) {
           ctx.recordSequence++;
-          const artistName = artist.firstName 
-            ? `${artist.lastName}, ${artist.firstName}`
-            : artist.lastName;
-          records.push(generatePER(ctx, artistName, artist.isni));
+          const artistName = artist.firstName
+            ? `${artist.lastName ?? ''}, ${artist.firstName}`.trim()
+            : (artist.lastName ?? '');
+          records.push(generatePER(ctx, artistName || 'UNKNOWN ARTIST', artist.isni));
           recordCount++;
         }
         
@@ -381,7 +383,7 @@ export const generateCWR = (
         records.push(generateREC(ctx, {
           title: recording.title,
           isrc: recording.isrc,
-          duration: recording.duration,
+          duration: recording.duration != null ? Number(recording.duration) : undefined,
           releaseDate: recording.releaseDate,
         }));
         recordCount++;

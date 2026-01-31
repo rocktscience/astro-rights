@@ -12,6 +12,7 @@ import type {
   AgreementParty,
   AgreementTerritory,
   AgreementType,
+  AgreementSubType,
   AgreementStatus,
   BusinessStructure,
   InterestedPartyType,
@@ -322,6 +323,36 @@ function mapAgreementType(value: string): AgreementType {
   return map[value.toLowerCase()] || 'Miscellaneous';
 }
 
+function mapAgreementSubType(value: string): AgreementSubType | undefined {
+  if (!value || value.trim() === '') return undefined;
+  const v = value.trim().toLowerCase();
+  const map: Record<string, AgreementSubType> = {
+    // Publishing
+    'publishing administration': 'Publishing Administration',
+    'administration': 'Publishing Administration',
+    'co-publishing': 'Co-Publishing',
+    'copublishing': 'Co-Publishing',
+    'sub-publishing general': 'Sub-publishing General',
+    'sub publishing general': 'Sub-publishing General',
+    'sub-publishing specific': 'Sub-publishing Specific',
+    'sub publishing specific': 'Sub-publishing Specific',
+    'original general': 'Original General',
+    'original specific': 'Original Specific',
+
+    // Master
+    'distribution': 'Distribution',
+
+    // Management
+    'artist management': 'Artist Management',
+
+    // Fallback-friendly aliases
+    'publishing': 'Original General',
+    'sub-publishing': 'Sub-publishing General',
+  };
+
+  return map[v];
+}
+
 function mapAgreementStatus(value: string): AgreementStatus {
   const map: Record<string, AgreementStatus> = {
     'active': 'Active',
@@ -339,7 +370,7 @@ export function mapAgreementFromCSV(row: Record<string, string>): Omit<Agreement
   return {
     agreementId: row['Agreement ID'] || '',
     type: mapAgreementType(row['Type']),
-    agreementType: row['Agreement Type'] || undefined,
+    agreementType: mapAgreementSubType(row['Agreement Type']),
     status: mapAgreementStatus(row['Status']),
     language: row['Language'] || undefined,
     advance: parseNumber(row['Advance']),

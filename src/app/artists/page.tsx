@@ -24,7 +24,7 @@ export default function ArtistsPage() {
 
   const filteredArtists = artists.filter(
     (a) =>
-      getArtistName(a).toLowerCase().includes(search.toLowerCase()) ||
+      (getArtistName(a) ?? '').toLowerCase().includes(search.toLowerCase()) ||
       a.isni?.includes(search)
   );
 
@@ -139,11 +139,21 @@ export default function ArtistsPage() {
               isni: (form.elements.namedItem('isni') as HTMLInputElement).value || undefined,
               ipn: (form.elements.namedItem('ipn') as HTMLInputElement).value || undefined,
             };
+            const dataWithDefaults = {
+              // Required-by-store fields (draft-safe defaults)
+              name: `${data.firstName ? `${data.firstName} ` : ''}${data.lastName}`.trim(),
+              isControlled: false,
+              recordingIds: [],
+              releaseIds: [],
+              socialLinks: [],
+              contacts: [],
+              ...data,
+            };
             if (editingArtist) {
               updateArtist(editingArtist.id, data);
               addToast({ type: 'success', title: 'Artist updated' });
             } else {
-              addArtist(data);
+              addArtist(dataWithDefaults as any);
               addToast({ type: 'success', title: 'Artist added' });
             }
             setShowModal(false);

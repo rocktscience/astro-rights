@@ -63,7 +63,8 @@ const navGroups = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { sidebarCollapsed, toggleSidebar } = useStore();
+  const sidebarCollapsed = useStore((s: any) => s.sidebarCollapsed);
+  const toggleSidebar = useStore((s: any) => s.toggleSidebar);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   return (

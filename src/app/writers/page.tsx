@@ -17,7 +17,7 @@ export default function WritersPage() {
 
   const filteredWriters = writers.filter(
     (w) =>
-      w.lastName.toLowerCase().includes(search.toLowerCase()) ||
+      (w.lastName ?? '').toLowerCase().includes(search.toLowerCase()) ||
       w.firstName?.toLowerCase().includes(search.toLowerCase()) ||
       w.ipiNameNumber?.includes(search)
   );
@@ -166,7 +166,7 @@ export default function WritersPage() {
         onClose={() => setShowModal(false)}
         writer={editingWriter}
         societies={societies}
-        agreements={publishingAgreements}
+        agreements={publishingAgreements.map((a) => ({ id: a.id, title: a.title ?? a.agreementNumber ?? 'Untitled agreement' }))}
         onSave={(data) => {
           if (editingWriter) {
             updateWriter(editingWriter.id, data);

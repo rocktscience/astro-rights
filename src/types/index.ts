@@ -78,33 +78,64 @@ export type BusinessStructure =
 export type ArtistType = 'Artist' | 'Producer' | 'Artist,Producer' | string;
 
 // Agreement types expanded based on CSV
-export type AgreementType = 
+export type AgreementType =
+  // Canonical (Title Case)
   | 'Recording Agreement'
   | 'Publishing'
   | 'Publishing Administration'
+  | 'Co-Publishing'
+  | 'Sub-Publishing'
   | 'Management'
   | 'Master'
   | 'Consulting'
   | 'Miscellaneous'
-  | 'Distribution';
+  | 'Distribution'
+
+  // Backward-compatible lowercase values used by some UI pages
+  | 'publishing'
+  | 'publishing administration'
+  | 'administration'
+  | 'co-publishing'
+  | 'sub-publishing'
+  | 'management'
+  | 'master'
+  | 'consulting'
+  | 'miscellaneous'
+  | 'distribution'
+  | 'recording'
+  | 'recording agreement';
 
 export type AgreementSubType =
   | 'Recording'
+  | 'Publishing Administration'
+  | 'Co-Publishing'
   | 'Original General'
+  | 'Original Specific'
   | 'Sub-publishing General'
+  | 'Sub-publishing Specific'
   | 'Artist Management'
   | 'Distribution'
   | 'Consulting'
   | 'Mutual Termination';
 
-export type AgreementStatus = 
+export type AgreementStatus =
+  // Canonical (Title Case)
   | 'Active'
   | 'Renewed'
   | 'Ended'
   | 'Cancelled'
   | 'Draft'
   | 'Expired'
-  | 'Terminated';
+  | 'Terminated'
+
+  // Backward-compatible lowercase values used by some UI pages
+  | 'active'
+  | 'renewed'
+  | 'ended'
+  | 'cancelled'
+  | 'draft'
+  | 'expired'
+  | 'terminated';
 
 // Agreement Party roles
 export type PartyRole = 'Licensee' | 'Assignor' | 'Licensor' | 'Administrator';
@@ -1007,9 +1038,13 @@ export interface Work {
   updatedAt: Date;
 }
 
+
 // ===========================
 // CWR EXPORT TYPES
 // ===========================
+
+export type CWRVersion = '2.1' | '2.2' | '3.0' | '3.1';
+export type TransactionType = 'NWR' | 'REV';
 
 export interface CWRExport {
   id: UUID;
@@ -1021,7 +1056,12 @@ export interface CWRExport {
   createdAt: Date;
   sentAt?: Date;
   recipientSociety?: string;
-  status: 'draft' | 'sent' | 'acknowledged';
+  status: 'draft' | 'generated' | 'sent' | 'acknowledged';
+
+  // Output snapshot (set once generated)
+  generatedAt?: Date;
+  outputText?: string;
+  outputSha256?: string;
 }
 
 export interface CWRGenerationOptions {
@@ -1030,6 +1070,51 @@ export interface CWRGenerationOptions {
   recipientSociety: string;
   submitterCode: string;
   workIds: UUID[];
+}
+
+// ===========================
+// METADATA COMPLETENESS + VALIDATION
+// ===========================
+
+export type EntityType =
+  | 'work'
+  | 'writer'
+  | 'publisher'
+  | 'artist'
+  | 'label'
+  | 'recording'
+  | 'release'
+  | 'agreement';
+
+export type ValidationLevel = 'lenient' | 'standard' | 'strict';
+
+export type ValidationIssueLevel = 'blocker' | 'warning' | 'info';
+
+export interface ValidationIssue {
+  code: string;
+  level: ValidationIssueLevel;
+  field?: string;
+  message: string;
+}
+
+export interface CompletenessBreakdown {
+  entityType: EntityType;
+  entityId: UUID;
+  percent: number; // 0-100
+  criticalMissing: string[];
+  needsAttention: string[];
+  completed: string[];
+  updatedAt: Date;
+}
+
+export interface CWRWorkEligibility {
+  workId: UUID;
+  version: CWRVersion;
+  transactionType: TransactionType;
+  level: ValidationLevel;
+  eligible: boolean;
+  blockers: ValidationIssue[];
+  warnings: ValidationIssue[];
 }
 
 // ===========================

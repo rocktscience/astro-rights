@@ -176,11 +176,21 @@ export default function AgreementsPage() {
               termEndDate: (form.elements.namedItem('termEndDate') as HTMLInputElement).value ? new Date((form.elements.namedItem('termEndDate') as HTMLInputElement).value) : undefined,
               territories: editingAgreement?.territories || [],
             };
+            const dataWithDefaults = {
+              // Required-by-store fields (draft-safe defaults)
+              agreementId: (data as any).agreementId ?? data.agreementNumber ?? '',
+              agreementTerritoryIds: (data as any).agreementTerritoryIds ?? [],
+              agreementPartyIds: (data as any).agreementPartyIds ?? [],
+              workIds: (data as any).workIds ?? [],
+              releaseIds: (data as any).releaseIds ?? [],
+              numberOfWorks: (data as any).numberOfWorks ?? 0,
+              ...data,
+            };
             if (editingAgreement) {
               updateAgreement(editingAgreement.id, data);
               addToast({ type: 'success', title: 'Agreement updated' });
             } else {
-              addAgreement(data);
+              addAgreement(dataWithDefaults as any);
               addToast({ type: 'success', title: 'Agreement added' });
             }
             setShowModal(false);

@@ -19,7 +19,7 @@ export default function RecordingsPage() {
     (r) =>
       r.title.toLowerCase().includes(search.toLowerCase()) ||
       r.isrc?.toLowerCase().includes(search.toLowerCase()) ||
-      r.artists?.some(a => a.lastName.toLowerCase().includes(search.toLowerCase()))
+      r.artists?.some(a => (a.lastName ?? '').toLowerCase().includes(search.toLowerCase()))
   );
 
   const handleDelete = (id: string) => {
@@ -85,7 +85,13 @@ export default function RecordingsPage() {
                   <td className="px-6 py-4 text-zinc-300">{recording.artists?.map(a => a.lastName).join(', ') || '—'}</td>
                   <td className="px-6 py-4 text-zinc-300">{recording.label?.name || '—'}</td>
                   <td className="px-6 py-4 text-zinc-400">
-                    {recording.duration ? `${Math.floor(recording.duration / 60)}:${String(recording.duration % 60).padStart(2, '0')}` : '—'}
+                    {(() => {
+                      const dur = Number(recording.duration);
+                      if (!Number.isFinite(dur) || dur <= 0) return '—';
+                      const mins = Math.floor(dur / 60);
+                      const secs = Math.floor(dur % 60);
+                      return `${mins}:${String(secs).padStart(2, '0')}`;
+                    })()}
                   </td>
                   <td className="px-6 py-4">
                     {recording.workId ? (
@@ -158,15 +164,17 @@ interface RecordingModalProps {
   isOpen: boolean;
   onClose: () => void;
   recording: Recording | null;
-  artists: Array<{ id: string; firstName?: string; lastName: string }>;
+  artists: Array<{ id: string; firstName?: string; lastName?: string }>;
   labels: Array<{ id: string; name: string }>;
   works: Array<{ id: string; title: string }>;
   onSave: (data: Partial<Recording>) => void;
 }
 
 function RecordingModal({ isOpen, onClose, recording, artists, labels, works, onSave }: RecordingModalProps) {
-  const [formData, setFormData] = useState<Partial<Recording>>(
-    recording || { title: '', isrc: '', duration: 0, artistIds: [], labelId: '', workId: '' }
+  const [formData, setFormData] = useState<Partial<Recording>>(() =>
+    recording
+      ? { ...recording, duration: (recording as any).duration ?? '' }
+      : { title: '', isrc: '', duration: '', artistIds: [], labelId: '', workId: '' }
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -194,15 +202,15 @@ function RecordingModal({ isOpen, onClose, recording, artists, labels, works, on
           <Input
             label="Duration (seconds)"
             type="number"
-            value={formData.duration || 0}
-            onChange={(e) => setFormData({ ...formData, duration: Number(e.target.value) })}
+            value={formData.duration ? Number(formData.duration) : 0}
+            onChange={(e) => setFormData({ ...formData, duration: String(e.target.value) })}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <Select
             label="Artist"
-            options={[{ value: '', label: 'Select...' }, ...artists.map((a) => ({ value: a.id, label: `${a.firstName || ''} ${a.lastName}`.trim() }))]}
+            options={[{ value: '', label: 'Select...' }, ...artists.map((a) => ({ value: a.id, label: `${a.firstName || ''} ${a.lastName || ''}`.trim() }))]}
             value={formData.artistIds?.[0] || ''}
             onChange={(e) => setFormData({ ...formData, artistIds: e.target.value ? [e.target.value] : [] })}
           />

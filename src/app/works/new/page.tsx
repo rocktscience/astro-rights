@@ -62,6 +62,7 @@ export default function NewWorkPage() {
     }
 
     addWork({
+      workId: '',
       title,
       iswc: iswc || undefined,
       versionType: versionType as any,

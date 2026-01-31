@@ -506,7 +506,13 @@ export default function WorksPage() {
                           <div>
                             <p className="font-medium text-white">{rec.title}</p>
                             <p className="text-sm text-zinc-500">
-                              {rec.artists?.map(a => a.lastName).join(', ') || 'Unknown Artist'} • {rec.duration ? `${Math.floor(rec.duration / 60)}:${String(rec.duration % 60).padStart(2, '0')}` : '—'}
+                              {rec.artists?.map(a => a.lastName).join(', ') || 'Unknown Artist'} • {(() => {
+                                const dur = Number(rec.duration);
+                                if (!Number.isFinite(dur) || dur <= 0) return '—';
+                                const mins = Math.floor(dur / 60);
+                                const secs = Math.floor(dur % 60);
+                                return `${mins}:${String(secs).padStart(2, '0')}`;
+                              })()}
                             </p>
                           </div>
                           {rec.isrc && (
@@ -635,7 +641,14 @@ function CWRGenerationForm({ workIds, onClose }: { workIds: string[]; onClose: (
 
     try {
       const { generateCWR } = await import('@/lib/cwr-generator');
-      
+      if (!publisherSettings) {
+        addToast({
+          type: 'error',
+          title: 'Missing publisher settings',
+          message: 'Set your Publisher Settings (delivery code) before generating CWR.',
+        });
+        return;
+      }
       const result = generateCWR(selectedWorks, publisherSettings, {
         version,
         transactionType,

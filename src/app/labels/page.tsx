@@ -117,11 +117,19 @@ export default function LabelsPage() {
             e.preventDefault();
             const form = e.target as HTMLFormElement;
             const data = { name: (form.elements.namedItem('name') as HTMLInputElement).value };
+            const dataWithDefaults = {
+              // Required-by-store fields (draft-safe defaults)
+              labelId: '',
+              isControlled: false,
+              recordingIds: [],
+              releaseIds: [],
+              ...data,
+            };
             if (editingLabel) {
               updateLabel(editingLabel.id, data);
               addToast({ type: 'success', title: 'Label updated' });
             } else {
-              addLabel(data);
+              addLabel(dataWithDefaults as any);
               addToast({ type: 'success', title: 'Label added' });
             }
             setShowModal(false);

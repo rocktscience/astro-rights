@@ -17,7 +17,7 @@ export default function ReleasesPage() {
 
   const filteredReleases = releases.filter(
     (r) =>
-      r.title.toLowerCase().includes(search.toLowerCase()) ||
+      (r.title ?? '').toLowerCase().includes(search.toLowerCase()) ||
       r.upc?.includes(search) ||
       r.catalogNumber?.toLowerCase().includes(search.toLowerCase())
   );
@@ -142,11 +142,18 @@ export default function ReleasesPage() {
               releaseType: (form.elements.namedItem('type') as HTMLSelectElement).value as Release['releaseType'],
               recordingIds: [],
             };
+            const dataWithDefaults = {
+              // Required-by-store fields (draft-safe defaults)
+              releaseId: '',
+              releaseName: data.title,
+              isControlled: false,
+              ...data,
+            };
             if (editingRelease) {
               updateRelease(editingRelease.id, data);
               addToast({ type: 'success', title: 'Release updated' });
             } else {
-              addRelease(data as Omit<Release, 'id' | 'createdAt' | 'updatedAt'>);
+              addRelease(dataWithDefaults as any);
               addToast({ type: 'success', title: 'Release added' });
             }
             setShowModal(false);
