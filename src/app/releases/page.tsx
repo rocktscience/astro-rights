@@ -153,7 +153,8 @@ export default function ReleasesPage() {
               updateRelease(editingRelease.id, data);
               addToast({ type: 'success', title: 'Release updated' });
             } else {
-              addRelease(dataWithDefaults as any);
+              const payload: Omit<Release, 'id' | 'createdAt' | 'updatedAt'> = dataWithDefaults as Omit<Release, 'id' | 'createdAt' | 'updatedAt'>;
+              addRelease(payload);
               addToast({ type: 'success', title: 'Release added' });
             }
             setShowModal(false);

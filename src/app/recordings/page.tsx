@@ -173,7 +173,7 @@ interface RecordingModalProps {
 function RecordingModal({ isOpen, onClose, recording, artists, labels, works, onSave }: RecordingModalProps) {
   const [formData, setFormData] = useState<Partial<Recording>>(() =>
     recording
-      ? { ...recording, duration: (recording as any).duration ?? '' }
+      ? { ...recording, duration: recording.duration ?? '' }
       : { title: '', isrc: '', duration: '', artistIds: [], labelId: '', workId: '' }
   );
 

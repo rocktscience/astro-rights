@@ -1039,34 +1039,36 @@ export const useStore = create<MusicPublisherStore>()(
         },
         setItem: (name, value) => {
           // Remove circular references before storing
-          const sanitize = (obj: any): any => {
+          const sanitize = (obj: unknown): unknown => {
             if (obj === null || obj === undefined) return obj;
             if (typeof obj !== 'object') return obj;
             if (obj instanceof Date) return obj.toISOString();
-            if (Array.isArray(obj)) return obj.map(sanitize);
+            if (Array.isArray(obj)) return (obj as unknown[]).map(sanitize);
             
-            const cleaned: any = {};
-            for (const key of Object.keys(obj)) {
+            const cleaned: Record<string, unknown> = {};
+            for (const key of Object.keys(obj as Record<string, unknown>)) {
               // Skip nested object references that cause cycles
               if (['writer', 'publisher', 'artist', 'label', 'agreement', 'work', 
                    'parentLabel', 'parentPublisher', 'prAffiliation', 'mrAffiliation',
                    'srAffiliation', 'recordings', 'artists'].includes(key)) {
                 continue;
               }
-              cleaned[key] = sanitize(obj[key]);
+              // @ts-ignore - dynamic deep sanitize
+              cleaned[key] = sanitize((obj as Record<string, unknown>)[key]);
             }
             return cleaned;
           };
           
+          const val = value as { state?: unknown };
           const sanitized = {
             ...value,
-            state: sanitize(value.state)
+            state: sanitize(val.state)
           };
           localStorage.setItem(name, JSON.stringify(sanitized));
         },
         removeItem: (name) => localStorage.removeItem(name),
       },
-      partialize: (state): any => ({
+      partialize: (state: MusicPublisherStore): Partial<MusicPublisherStore> => ({
         theme: state.theme,
         sidebarCollapsed: state.sidebarCollapsed,
         publisherSettings: state.publisherSettings,

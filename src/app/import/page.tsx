@@ -10,7 +10,7 @@ import {
   Building2, Disc3, UserCircle, Handshake, Contact2, Briefcase, Globe, Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { RoyaltyLineItem } from '@/types';
+import type { RoyaltyLineItem, RightType } from '@/types';
 import {
   parseCSV,
   mapLabelFromCSV,
@@ -248,6 +248,7 @@ export default function ImportPage() {
               totalGross += grossAmount;
               totalNet += netAmount;
 
+              const rt = (normalized['righttype'] || normalized['right_type'] || 'PR') as RightType;
               lineItems.push({
                 id: `li-${Date.now()}-${idx + 1}`,
                 statementId,
@@ -255,7 +256,7 @@ export default function ImportPage() {
                 workTitle: normalized['title'] || normalized['worktitle'] || '',
                 grossAmount,
                 netAmount,
-                rightType: (normalized['righttype'] || normalized['right_type'] || 'PR') as any,
+                rightType: rt,
                 matched: false,
               });
               success++;
@@ -319,6 +320,7 @@ export default function ImportPage() {
   };
 
   const Icon = tabs.find(t => t.id === activeTab)?.icon || FileText;
+  const activeTabInfo = tabs.find(t => t.id === activeTab);
 
   return (
     <PageLayout
@@ -367,8 +369,7 @@ export default function ImportPage() {
           Clear existing data before import
         </label>
         
-        {tabs.find(t => t.id === activeTab)?.count !== undefined && 
-         (tabs.find(t => t.id === activeTab) as any).count > 0 && (
+        {activeTabInfo?.count && activeTabInfo.count > 0 && (
           <Button
             variant="ghost"
             size="sm"

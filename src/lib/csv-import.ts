@@ -20,6 +20,7 @@ import type {
   NetGrossType,
   PublisherRole,
   PROType,
+  Work,
 } from '@/types';
 
 // ===========================
@@ -479,7 +480,7 @@ export function mapAgreementTerritoryFromCSV(row: Record<string, string>): Omit<
 // WORK MAPPING HELPER (for tests)
 // ===========================
 
-export function mapWorkFromCSV(row: Record<string, string>): Omit<any, 'id' | 'createdAt' | 'updatedAt'> {
+export function mapWorkFromCSV(row: Record<string, string>): Omit<Work, 'id' | 'createdAt' | 'updatedAt'> {
   return {
     workId: row['Work ID'] || row['WorkID'] || row['work_id'] || '',
     title: row['Title'] || row['title'] || 'Untitled',

@@ -129,7 +129,8 @@ export default function LabelsPage() {
               updateLabel(editingLabel.id, data);
               addToast({ type: 'success', title: 'Label updated' });
             } else {
-              addLabel(dataWithDefaults as any);
+              const payload: Omit<Label, 'id' | 'createdAt' | 'updatedAt'> = dataWithDefaults as Omit<Label, 'id' | 'createdAt' | 'updatedAt'>;
+              addLabel(payload);
               addToast({ type: 'success', title: 'Label added' });
             }
             setShowModal(false);

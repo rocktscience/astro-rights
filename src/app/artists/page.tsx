@@ -145,7 +145,6 @@ export default function ArtistsPage() {
               isControlled: false,
               recordingIds: [],
               releaseIds: [],
-              socialLinks: [],
               contacts: [],
               ...data,
             };
@@ -153,7 +152,8 @@ export default function ArtistsPage() {
               updateArtist(editingArtist.id, data);
               addToast({ type: 'success', title: 'Artist updated' });
             } else {
-              addArtist(dataWithDefaults as any);
+              const artistPayload: Omit<Artist, 'id' | 'createdAt' | 'updatedAt'> = dataWithDefaults as Omit<Artist, 'id' | 'createdAt' | 'updatedAt'>;
+              addArtist(artistPayload);
               addToast({ type: 'success', title: 'Artist added' });
             }
             setShowModal(false);
