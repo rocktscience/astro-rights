@@ -476,6 +476,26 @@ export function mapAgreementTerritoryFromCSV(row: Record<string, string>): Omit<
 }
 
 // ===========================
+// WORK MAPPING HELPER (for tests)
+// ===========================
+
+export function mapWorkFromCSV(row: Record<string, string>): Omit<any, 'id' | 'createdAt' | 'updatedAt'> {
+  return {
+    workId: row['Work ID'] || row['WorkID'] || row['work_id'] || '',
+    title: row['Title'] || row['title'] || 'Untitled',
+    iswc: row['ISWC'] || row['iswc'] || undefined,
+    versionType: (row['Version Type'] || row['VersionType'] || 'ORI') as 'ORI' | 'MOD' | 'ARR',
+    language: row['Language'] || 'EN',
+    writerShares: [],
+    publisherShares: [],
+    alternateTitles: [],
+    recordings: [],
+    registrations: [],
+    status: 'draft',
+  };
+}
+
+// ===========================
 // BATCH IMPORT FUNCTION
 // ===========================
 
