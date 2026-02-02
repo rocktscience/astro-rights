@@ -196,23 +196,25 @@ export default function ImportPage() {
         messages.push(...stats.errors);
         
       } else if (activeTab === 'works') {
-        const lines = content.split('\n').filter(l => l.trim());
-        const headers = lines[0]?.split(',').map(h => h.trim().toLowerCase());
-        
-        if (headers) {
-          for (let i = 1; i < lines.length; i++) {
+        const records = parseCSV(content);
+        if (records && records.length > 0) {
+          records.forEach((row, idx) => {
             try {
-              const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-              const work: Record<string, string> = {};
-              headers.forEach((h, idx) => { work[h] = values[idx] || ''; });
-              
+              const normalized: Record<string, string> = {};
+              Object.keys(row).forEach((k) => {
+                normalized[k.replace(/\s+/g, '').toLowerCase()] = row[k];
+              });
+
+              const workId = normalized['workid'] || normalized['work_id'] || normalized['workid'] || `RWOR${10000 + idx + 1}`;
+              const titleVal = normalized['title'] || `Work ${idx + 1}`;
+
               addWork({
-                workId: work.workid || work.work_id || `RWOR${10000 + i}`,
-                title: work.title || `Work ${i}`,
-                iswc: work.iswc || undefined,
-                versionType: (work.versiontype || work.version_type || 'ORI') as 'ORI' | 'MOD',
+                workId,
+                title: titleVal,
+                iswc: normalized['iswc'] || undefined,
+                versionType: (normalized['versiontype'] || normalized['version_type'] || 'ORI') as 'ORI' | 'MOD' | 'ARR',
                 status: 'draft',
-                language: work.language || 'EN',
+                language: normalized['language'] || 'EN',
                 writerShares: [],
                 publisherShares: [],
                 alternateTitles: [],
@@ -222,47 +224,47 @@ export default function ImportPage() {
               success++;
             } catch (err) {
               errors++;
-              messages.push(`Row ${i}: Failed to import`);
+              messages.push(`Row ${idx + 2}: Failed to import`);
             }
-          }
+          });
         }
-      } else if (activeTab === 'royalties') {
-        const lines = content.split('\n').filter(l => l.trim());
-        const headers = lines[0]?.split(',').map(h => h.trim().toLowerCase());
-        
-        if (headers) {
+      } else if (activeTab === 'royalties') { 
+        const records = parseCSV(content);
+        if (records && records.length > 0) {
           const lineItems: RoyaltyLineItem[] = [];
           let totalGross = 0;
           let totalNet = 0;
           const statementId = `stmt-${Date.now()}`;
-          
-          for (let i = 1; i < lines.length; i++) {
+
+          records.forEach((row, idx) => {
             try {
-              const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-              const row: Record<string, string> = {};
-              headers.forEach((h, idx) => { row[h] = values[idx] || ''; });
-              
-              const grossAmount = parseFloat(row.amount || row.gross || '0');
-              const netAmount = parseFloat(row.net || row.amount || row.gross || '0') * 0.9;
+              const normalized: Record<string, string> = {};
+              Object.keys(row).forEach((k) => {
+                normalized[k.replace(/\s+/g, '').toLowerCase()] = row[k];
+              });
+
+              const grossAmount = parseFloat(normalized['amount'] || normalized['gross'] || '0') || 0;
+              const netAmount = (parseFloat(normalized['net'] || normalized['amount'] || normalized['gross'] || '0') || 0) * 0.9;
               totalGross += grossAmount;
               totalNet += netAmount;
-              
+
               lineItems.push({
-                id: `li-${Date.now()}-${i}`,
+                id: `li-${Date.now()}-${idx + 1}`,
                 statementId,
-                workId: row.workid || row.work_id || undefined,
-                workTitle: row.title || row.worktitle || '',
+                workId: normalized['workid'] || normalized['work_id'] || undefined,
+                workTitle: normalized['title'] || normalized['worktitle'] || '',
                 grossAmount,
                 netAmount,
-                rightType: (row.righttype || row.right_type || 'PR') as any,
+                rightType: (normalized['righttype'] || normalized['right_type'] || 'PR') as any,
                 matched: false,
               });
               success++;
             } catch (err) {
               errors++;
+              messages.push(`Row ${idx + 2}: Failed to parse royalty row`);
             }
-          }
-          
+          });
+
           if (lineItems.length > 0) {
             addRoyaltyStatement({
               period: file.name.replace(/\.[^/.]+$/, ''),

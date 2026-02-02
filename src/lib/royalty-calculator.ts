@@ -1,6 +1,7 @@
 // Royalty calculation and distribution utilities
 
 import type { Work, Writer, RoyaltyLineItem, WriterDistribution, RoyaltyStatement } from '@/types';
+import { parseCSV } from '@/lib/csv-import';
 
 export interface DistributionResult {
   lineItemId: string;
@@ -342,74 +343,73 @@ export const parseRoyaltyCSV = (
 ): { rows: ParsedRoyaltyRow[]; errors: string[] } => {
   const errors: string[] = [];
   const rows: ParsedRoyaltyRow[] = [];
-  
-  const lines = csvContent.split('\n').filter(l => l.trim());
-  if (lines.length < 2) {
+
+  const records = parseCSV(csvContent);
+  if (records.length < 1) {
     errors.push('CSV must have at least a header row and one data row');
     return { rows, errors };
   }
-  
-  // Parse header
-  const header = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-  const colIndex: Record<string, number> = {};
-  header.forEach((col, idx) => {
-    colIndex[col.toLowerCase()] = idx;
+
+  // Build normalized header map (normalized -> actual header key)
+  const headers = Object.keys(records[0]);
+  const colIndex: Record<string, string> = {};
+  headers.forEach((h) => {
+    colIndex[h.toLowerCase().replace(/\s+/g, '')] = h;
   });
-  
-  // Find column indices
-  const getColIndex = (mappedName: string | undefined): number => {
-    if (!mappedName) return -1;
-    return colIndex[mappedName.toLowerCase()] ?? -1;
+
+  const getColKey = (mappedName?: string): string | undefined => {
+    if (!mappedName) return undefined;
+    return colIndex[(mappedName || '').toLowerCase().replace(/\s+/g, '')];
   };
-  
-  const grossAmountIdx = getColIndex(columnMapping.grossAmount);
-  if (grossAmountIdx === -1) {
+
+  const grossKey = getColKey(columnMapping.grossAmount);
+  if (!grossKey) {
     errors.push(`Required column "${columnMapping.grossAmount}" not found`);
     return { rows, errors };
   }
-  
-  // Parse data rows
-  for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
-    
+
+  records.forEach((rec, idx) => {
     try {
-      const grossAmount = parseFloat(values[grossAmountIdx]) || 0;
-      
-      const row: ParsedRoyaltyRow = {
-        grossAmount,
-      };
-      
-      const workTitleIdx = getColIndex(columnMapping.workTitle);
-      if (workTitleIdx !== -1) row.workTitle = values[workTitleIdx];
-      
-      const iswcIdx = getColIndex(columnMapping.iswc);
-      if (iswcIdx !== -1) row.iswc = values[iswcIdx];
-      
-      const territoryIdx = getColIndex(columnMapping.territory);
-      if (territoryIdx !== -1) row.territory = values[territoryIdx];
-      
-      const rightTypeIdx = getColIndex(columnMapping.rightType);
-      if (rightTypeIdx !== -1) {
-        const rt = values[rightTypeIdx]?.toUpperCase();
-        if (rt === 'PR' || rt === 'MR' || rt === 'SR') {
-          row.rightType = rt;
-        }
+      const grossVal = (rec[grossKey] || '').replace(/"/g, '').trim();
+      const grossAmount = parseFloat(grossVal) || 0;
+
+      const row: ParsedRoyaltyRow = { grossAmount };
+
+      const workTitleKey = getColKey(columnMapping.workTitle);
+      if (workTitleKey) row.workTitle = (rec[workTitleKey] || '').replace(/"/g, '').trim();
+
+      const iswcKey = getColKey(columnMapping.iswc);
+      if (iswcKey) row.iswc = (rec[iswcKey] || '').replace(/"/g, '').trim();
+
+      const territoryKey = getColKey(columnMapping.territory);
+      if (territoryKey) row.territory = (rec[territoryKey] || '').replace(/"/g, '').trim();
+
+      const rightTypeKey = getColKey(columnMapping.rightType);
+      if (rightTypeKey) {
+        const rt = ((rec[rightTypeKey] || '').replace(/"/g, '').trim()).toUpperCase();
+        if (rt === 'PR' || rt === 'MR' || rt === 'SR') row.rightType = rt as 'PR' | 'MR' | 'SR';
       }
-      
-      const usageTypeIdx = getColIndex(columnMapping.usageType);
-      if (usageTypeIdx !== -1) row.usageType = values[usageTypeIdx];
-      
-      const unitsIdx = getColIndex(columnMapping.units);
-      if (unitsIdx !== -1) row.units = parseInt(values[unitsIdx]) || undefined;
-      
-      const netAmountIdx = getColIndex(columnMapping.netAmount);
-      if (netAmountIdx !== -1) row.netAmount = parseFloat(values[netAmountIdx]) || undefined;
-      
+
+      const usageTypeKey = getColKey(columnMapping.usageType);
+      if (usageTypeKey) row.usageType = (rec[usageTypeKey] || '').replace(/"/g, '').trim();
+
+      const unitsKey = getColKey(columnMapping.units);
+      if (unitsKey) {
+        const u = parseInt((rec[unitsKey] || '').replace(/"/g, '').trim());
+        if (!isNaN(u)) row.units = u;
+      }
+
+      const netAmountKey = getColKey(columnMapping.netAmount);
+      if (netAmountKey) {
+        const n = parseFloat((rec[netAmountKey] || '').replace(/"/g, '').trim());
+        if (!isNaN(n)) row.netAmount = n;
+      }
+
       rows.push(row);
     } catch (e) {
-      errors.push(`Error parsing row ${i + 1}`);
+      errors.push(`Error parsing row ${idx + 1}`);
     }
-  }
-  
+  });
+
   return { rows, errors };
 };

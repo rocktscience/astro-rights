@@ -162,6 +162,9 @@ export default function AgreementsPage() {
           onSubmit={(e) => {
             e.preventDefault();
             const form = e.target as HTMLFormElement;
+            const adminFeeRaw = (form.elements.namedItem('adminFee') as HTMLInputElement).value.trim();
+            const prShareRaw = (form.elements.namedItem('prShare') as HTMLInputElement).value.trim();
+            const mrShareRaw = (form.elements.namedItem('mrShare') as HTMLInputElement).value.trim();
             const data = {
               title: (form.elements.namedItem('title') as HTMLInputElement).value,
               agreementNumber: (form.elements.namedItem('agreementNumber') as HTMLInputElement).value || undefined,
@@ -169,13 +172,13 @@ export default function AgreementsPage() {
               status: (form.elements.namedItem('status') as HTMLSelectElement).value as Agreement['status'],
               writerId: (form.elements.namedItem('writerId') as HTMLSelectElement).value || undefined,
               publisherId: (form.elements.namedItem('publisherId') as HTMLSelectElement).value || undefined,
-              adminFee: Number((form.elements.namedItem('adminFee') as HTMLInputElement).value) || undefined,
-              prShare: Number((form.elements.namedItem('prShare') as HTMLInputElement).value) || undefined,
-              mrShare: Number((form.elements.namedItem('mrShare') as HTMLInputElement).value) || undefined,
+              adminFee: adminFeeRaw === '' ? undefined : Number(adminFeeRaw),
+              prShare: prShareRaw === '' ? undefined : Number(prShareRaw),
+              mrShare: mrShareRaw === '' ? undefined : Number(mrShareRaw),
               termStartDate: (form.elements.namedItem('termStartDate') as HTMLInputElement).value ? new Date((form.elements.namedItem('termStartDate') as HTMLInputElement).value) : undefined,
               termEndDate: (form.elements.namedItem('termEndDate') as HTMLInputElement).value ? new Date((form.elements.namedItem('termEndDate') as HTMLInputElement).value) : undefined,
               territories: editingAgreement?.territories || [],
-            };
+            }; 
             const dataWithDefaults = {
               // Required-by-store fields (draft-safe defaults)
               agreementId: (data as any).agreementId ?? data.agreementNumber ?? '',

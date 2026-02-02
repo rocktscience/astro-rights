@@ -62,7 +62,7 @@ const navGroups = [
 ];
 
 export function Sidebar() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? '/';
   const sidebarCollapsed = useStore((s: any) => s.sidebarCollapsed);
   const toggleSidebar = useStore((s: any) => s.toggleSidebar);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -101,10 +101,10 @@ export function Sidebar() {
                 className="flex flex-col min-w-0"
               >
                 <span className="font-semibold text-sm text-white whitespace-nowrap tracking-tight">
-                  Rocket Science
+                  ASTRO
                 </span>
                 <span className="text-[11px] text-zinc-500 whitespace-nowrap">
-                  Music Publishing
+                  Rights Admin
                 </span>
               </motion.div>
             )}
