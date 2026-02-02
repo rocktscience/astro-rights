@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useStore } from '@/store';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, Badge, Button, Input, Modal, Select, EmptyState } from '@/components/ui/index';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FileSignature, Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { FileSignature, Plus, Search, Edit, Trash2, Upload } from 'lucide-react';
 import type { Agreement } from '@/types';
 import { formatDate } from '@/lib/utils';
 
@@ -45,9 +46,14 @@ export default function AgreementsPage() {
       description={`Manage ${agreements.length} publishing agreements`}
       icon={FileSignature}
       actions={
-        <Button onClick={() => { setEditingAgreement(null); setShowModal(true); }} leftIcon={<Plus className="w-4 h-4" />} glow>
-          Add Agreement
-        </Button>
+        <>
+          <Button onClick={() => { setEditingAgreement(null); setShowModal(true); }} leftIcon={<Plus className="w-4 h-4" />} glow>
+            Add Agreement
+          </Button>
+          <Link href="/import">
+            <Button variant="ghost" leftIcon={<Upload className="w-4 h-4" />}>Import</Button>
+          </Link>
+        </>
       }
     >
       <Card className="p-5 mb-6">

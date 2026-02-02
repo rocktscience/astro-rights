@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useStore } from '@/store';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, Badge, Button, Input, Modal, EmptyState } from '@/components/ui/index';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Mic2, Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Mic2, Plus, Search, Edit, Trash2, Upload } from 'lucide-react';
 import type { Artist } from '@/types';
 import { formatDate } from '@/lib/utils';
 
@@ -41,9 +42,14 @@ export default function ArtistsPage() {
       description={`Manage ${artists.length} performing artists`}
       icon={Mic2}
       actions={
-        <Button onClick={() => { setEditingArtist(null); setShowModal(true); }} leftIcon={<Plus className="w-4 h-4" />} glow>
-          Add Artist
-        </Button>
+        <>
+          <Button onClick={() => { setEditingArtist(null); setShowModal(true); }} leftIcon={<Plus className="w-4 h-4" />} glow>
+            Add Artist
+          </Button>
+          <Link href="/import">
+            <Button variant="ghost" leftIcon={<Upload className="w-4 h-4" />}>Import</Button>
+          </Link>
+        </>
       }
     >
       <Card className="p-5 mb-6">
@@ -142,10 +148,13 @@ export default function ArtistsPage() {
             const dataWithDefaults = {
               // Required-by-store fields (draft-safe defaults)
               name: `${data.firstName ? `${data.firstName} ` : ''}${data.lastName}`.trim(),
+              artistId: `ART${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
               isControlled: false,
               recordingIds: [],
               releaseIds: [],
               contacts: [],
+              artistShareIds: [],
+              producerCreditIds: [],
               ...data,
             };
             if (editingArtist) {

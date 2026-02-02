@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useStore } from '@/store';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, Badge, Button, Input, Modal, Select, EmptyState } from '@/components/ui/index';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Album, Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Album, Plus, Search, Edit, Trash2, Upload } from 'lucide-react';
 import type { Release } from '@/types';
 import { formatDate } from '@/lib/utils';
 
@@ -35,9 +36,14 @@ export default function ReleasesPage() {
       description={`Manage ${releases.length} album and single releases`}
       icon={Album}
       actions={
-        <Button onClick={() => { setEditingRelease(null); setShowModal(true); }} leftIcon={<Plus className="w-4 h-4" />} glow>
-          Add Release
-        </Button>
+        <>
+          <Button onClick={() => { setEditingRelease(null); setShowModal(true); }} leftIcon={<Plus className="w-4 h-4" />} glow>
+            Add Release
+          </Button>
+          <Link href="/import">
+            <Button variant="ghost" leftIcon={<Upload className="w-4 h-4" />}>Import</Button>
+          </Link>
+        </>
       }
     >
       <Card className="p-5 mb-6">

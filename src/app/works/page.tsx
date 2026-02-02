@@ -19,6 +19,7 @@ import {
   X,
   ArrowRight,
   Sparkles,
+  Upload,
 } from 'lucide-react';
 import Link from 'next/link';
 import { formatDate, getWriterCapacityLabel, cn } from '@/lib/utils';
@@ -53,14 +54,47 @@ export default function WorksPage() {
     clearWorkFilters,
     getFilteredWorks,
     addToast,
+    updateWork,
   } = useStore();
 
   const [showFilters, setShowFilters] = useState(false);
   const [viewingWork, setViewingWork] = useState<Work | null>(null);
   const [activeTab, setActiveTab] = useState('details');
   const [showCWRModal, setShowCWRModal] = useState(false);
+  const [sortBy, setSortBy] = useState<'workId' | 'title' | 'iswc' | 'updatedAt' | ''>('');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [showAddAlt, setShowAddAlt] = useState(false);
+  const [newAltTitle, setNewAltTitle] = useState('');
+  const [newAltType, setNewAltType] = useState<'AT' | 'FT' | 'IT' | 'OL' | 'OT' | 'PT' | 'RT' | 'ET' | 'TE'>('AT');
+  const [newAltLang, setNewAltLang] = useState('');
+  const [showAddLyric, setShowAddLyric] = useState(false);
+  const [newLyricLang, setNewLyricLang] = useState('');
+  const [newLyricContent, setNewLyricContent] = useState('');
 
   const filteredWorks = getFilteredWorks();
+
+  const sortedWorks = (() => {
+    const arr = [...filteredWorks];
+    if (!sortBy) return arr;
+    arr.sort((a, b) => {
+      const aVal: any = sortBy === 'updatedAt' ? new Date(a.updatedAt).getTime() : (a as any)[sortBy] ?? '';
+      const bVal: any = sortBy === 'updatedAt' ? new Date(b.updatedAt).getTime() : (b as any)[sortBy] ?? '';
+      if (typeof aVal === 'string') {
+        return sortDir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+      return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+    });
+    return arr;
+  })();
+
+  const toggleSort = (key: 'workId' | 'title' | 'iswc' | 'updatedAt') => {
+    if (sortBy === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(key);
+      setSortDir('asc');
+    }
+  };
 
   const isAllSelected = filteredWorks.length > 0 && 
     filteredWorks.every((w) => selectedWorkIds.includes(w.id));
@@ -104,6 +138,7 @@ export default function WorksPage() {
     { id: 'recordings', label: 'Recordings', count: viewingWork?.recordings?.length || 0 },
     { id: 'registrations', label: 'Registrations', count: viewingWork?.registrations?.length || 0 },
     { id: 'alternates', label: 'Alternate Titles', count: viewingWork?.alternateTitles?.length || 0 },
+    { id: 'lyrics', label: 'Lyrics', count: viewingWork?.lyrics?.length || 0 },
   ];
 
   return (
@@ -140,7 +175,7 @@ export default function WorksPage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              {selectedWorkIds.length > 0 && (
+              {selectedWorkIds.length > 0 ? (
                 <>
                   <Button variant="ghost" onClick={clearWorkSelection}>
                     Clear ({selectedWorkIds.length})
@@ -152,11 +187,15 @@ export default function WorksPage() {
                     Generate CWR
                   </Button>
                 </>
-              )}
-              {selectedWorkIds.length === 0 && (
-                <Link href="/works/new">
-                  <Button leftIcon={<Plus className="w-4 h-4" />} glow>Add Work</Button>
-                </Link>
+              ) : (
+                <>
+                  <Link href="/works/new">
+                    <Button leftIcon={<Plus className="w-4 h-4" />} glow>Add Work</Button>
+                  </Link>
+                  <Link href="/import">
+                    <Button variant="ghost" leftIcon={<Upload className="w-4 h-4" />}>Import</Button>
+                  </Link>
+                </>
               )}
             </div>
           </div>
@@ -233,56 +272,59 @@ export default function WorksPage() {
 
           {/* Works Table */}
           <Card padding="none" className="overflow-hidden">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto max-h-[60vh] overflow-y-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/5">
-                    <th className="px-5 py-4 text-left">
-                      <Checkbox
-                        checked={isAllSelected}
-                        onChange={handleSelectAll}
-                      />
+                    <th className="px-5 py-4 text-left sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">
+                      <div onClick={() => toggleSort('workId')} className="flex items-center gap-2 cursor-pointer">
+                        <Checkbox
+                          checked={isAllSelected}
+                          onChange={handleSelectAll}
+                        />
+                      </div>
                     </th>
-                    <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
-                      Work ID
+                    <th onClick={() => toggleSort('workId')} className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10 cursor-pointer">
+                      Work ID {sortBy === 'workId' && (sortDir === 'asc' ? '▲' : '▼')}
                     </th>
-                    <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
-                      Title
+                    <th onClick={() => toggleSort('title')} className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10 cursor-pointer">
+                      Title {sortBy === 'title' && (sortDir === 'asc' ? '▲' : '▼')}
                     </th>
-                    <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
-                      ISWC
+                    <th onClick={() => toggleSort('iswc')} className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10 cursor-pointer">
+                      ISWC {sortBy === 'iswc' && (sortDir === 'asc' ? '▲' : '▼')}
                     </th>
-                    <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                    <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">
                       Writers
                     </th>
-                    <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                    <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">
                       Type
                     </th>
-                    <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                    <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">
                       Status
                     </th>
-                    <th className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
-                      Updated
+                    <th onClick={() => toggleSort('updatedAt')} className="px-5 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10 cursor-pointer">
+                      Updated {sortBy === 'updatedAt' && (sortDir === 'asc' ? '▲' : '▼')}
                     </th>
-                    <th className="px-5 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                    <th className="px-5 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {filteredWorks.map((work) => (
+                  {sortedWorks.map((work) => (
                     <motion.tr
                       key={work.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
+                      onClick={() => setViewingWork(work)}
                       className={cn(
-                        'group transition-colors',
+                        'group transition-colors cursor-pointer',
                         selectedWorkIds.includes(work.id) 
                           ? 'bg-violet-500/5' 
                           : 'hover:bg-white/[0.02]'
                       )}
                     >
-                      <td className="px-5 py-4">
+                      <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                         <Checkbox
                           checked={selectedWorkIds.includes(work.id)}
                           onChange={() => toggleWorkSelection(work.id)}
@@ -294,12 +336,9 @@ export default function WorksPage() {
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <button
-                          onClick={() => setViewingWork(work)}
-                          className="font-medium text-white hover:text-violet-400 text-left transition-colors"
-                        >
+                        <div className="font-medium text-white text-left">
                           {work.title}
-                        </button>
+                        </div>
                         {(work.alternateTitles || []).length > 0 && (
                           <p className="text-xs text-zinc-600 mt-0.5">
                             +{work.alternateTitles.length} alt titles
@@ -356,14 +395,8 @@ export default function WorksPage() {
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => setViewingWork(work)}
-                            className="p-2 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-colors"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
                           <Link href={`/works/${work.id}/edit`}>
-                            <button className="p-2 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-colors">
+                            <button onClick={(e) => e.stopPropagation()} className="p-2 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-colors">
                               <Edit className="w-4 h-4" />
                             </button>
                           </Link>
@@ -456,6 +489,52 @@ export default function WorksPage() {
                           <div className="text-right">
                             <p className="text-sm text-zinc-400">PR: {ws.prOwnership}%</p>
                             <p className="text-sm text-zinc-400">MR: {ws.mrOwnership}%</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'lyrics' && (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-sm text-zinc-300">Lyrics</h4>
+                    <div>
+                      <Button variant="ghost" onClick={() => setShowAddLyric(true)}>Add Lyrics</Button>
+                    </div>
+                  </div>
+
+                  {showAddLyric && (
+                    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 mb-4">
+                      <div className="grid grid-cols-1 gap-3">
+                        <Input placeholder="Language" value={newLyricLang} onChange={(e) => setNewLyricLang(e.target.value)} />
+                        <textarea className="w-full p-3 rounded bg-white/[0.02] border border-white/5 text-white" rows={6} value={newLyricContent} onChange={(e) => setNewLyricContent(e.target.value)} />
+                      </div>
+                      <div className="flex justify-end gap-3 mt-3">
+                        <Button variant="secondary" onClick={() => setShowAddLyric(false)}>Cancel</Button>
+                        <Button onClick={() => {
+                          if (!viewingWork) return;
+                          const newLyric = { id: Math.random().toString(36).slice(2,9), language: newLyricLang, content: newLyricContent } as any;
+                          updateWork(viewingWork.id, { lyrics: [...(viewingWork.lyrics || []), newLyric] });
+                          setViewingWork({ ...viewingWork, lyrics: [...(viewingWork.lyrics || []), newLyric] });
+                          setNewLyricLang(''); setNewLyricContent(''); setShowAddLyric(false);
+                          addToast({ type: 'success', title: 'Lyrics added' });
+                        }}>Add</Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {(viewingWork.lyrics || []).length === 0 ? (
+                    <EmptyState title="No lyrics" description="Add lyrics when editing this work" />
+                  ) : (
+                    (viewingWork.lyrics || []).map((ly) => (
+                      <div key={(ly as any).id} className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="font-medium text-white">{ly.language || '—'}</p>
+                            <pre className="text-sm text-zinc-400 whitespace-pre-wrap mt-2">{ly.content}</pre>
                           </div>
                         </div>
                       </div>
@@ -568,6 +647,45 @@ export default function WorksPage() {
 
               {activeTab === 'alternates' && (
                 <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm text-zinc-300">Alternate Titles</h4>
+                    <div>
+                      <Button variant="ghost" onClick={() => setShowAddAlt(true)}>Add Alternate</Button>
+                    </div>
+                  </div>
+
+                  {showAddAlt && (
+                    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                      <div className="grid grid-cols-3 gap-3">
+                        <Input placeholder="Title" value={newAltTitle} onChange={(e) => setNewAltTitle(e.target.value)} />
+                        <Input placeholder="Language" value={newAltLang} onChange={(e) => setNewAltLang(e.target.value)} />
+                        <Select
+                          options={[
+                            { value: 'AT', label: 'Alternate Title' },
+                            { value: 'FT', label: 'First Line of Text' },
+                            { value: 'IT', label: 'Incorrect Title' },
+                            { value: 'OL', label: 'Original Title (Original Language)' },
+                            { value: 'OT', label: 'Original Title' },
+                          ]}
+                          value={newAltType}
+                          onChange={(e) => setNewAltType(e.target.value as any)}
+                        />
+                      </div>
+
+                      <div className="flex justify-end gap-3 mt-3">
+                        <Button variant="secondary" onClick={() => setShowAddAlt(false)}>Cancel</Button>
+                        <Button onClick={() => {
+                          if (!viewingWork) return;
+                          const newAlt = { id: Math.random().toString(36).slice(2,9), title: newAltTitle, type: newAltType, language: newAltLang };
+                          updateWork(viewingWork.id, { alternateTitles: [...(viewingWork.alternateTitles || []), newAlt] });
+                          setViewingWork({ ...viewingWork, alternateTitles: [...(viewingWork.alternateTitles || []), newAlt] });
+                          setNewAltTitle(''); setNewAltLang(''); setNewAltType('AT'); setShowAddAlt(false);
+                          addToast({ type: 'success', title: 'Alternate title added' });
+                        }}>Add</Button>
+                      </div>
+                    </div>
+                  )}
+
                   {(viewingWork.alternateTitles || []).length === 0 ? (
                     <EmptyState title="No alternate titles" description="Add alternate titles when editing this work" />
                   ) : (
@@ -576,7 +694,10 @@ export default function WorksPage() {
                         key={alt.id}
                         className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between"
                       >
-                        <p className="font-medium text-white">{alt.title}</p>
+                        <div>
+                          <p className="font-medium text-white">{alt.title}</p>
+                          {alt.language && <p className="text-xs text-zinc-500">{alt.language}</p>}
+                        </div>
                         <Badge variant="default">{alt.type}</Badge>
                       </div>
                     ))

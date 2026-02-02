@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useStore } from '@/store';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, Button, Input, Modal, EmptyState } from '@/components/ui/index';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { CircleDot, Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { CircleDot, Plus, Search, Edit, Trash2, Upload } from 'lucide-react';
 import type { Label } from '@/types';
 import { formatDate } from '@/lib/utils';
 
@@ -32,9 +33,14 @@ export default function LabelsPage() {
       description={`Manage ${labels.length} record labels`}
       icon={CircleDot}
       actions={
-        <Button onClick={() => { setEditingLabel(null); setShowModal(true); }} leftIcon={<Plus className="w-4 h-4" />} glow>
-          Add Label
-        </Button>
+        <>
+          <Button onClick={() => { setEditingLabel(null); setShowModal(true); }} leftIcon={<Plus className="w-4 h-4" />} glow>
+            Add Label
+          </Button>
+          <Link href="/import">
+            <Button variant="ghost" leftIcon={<Upload className="w-4 h-4" />}>Import</Button>
+          </Link>
+        </>
       }
     >
       <Card className="p-5 mb-6">
