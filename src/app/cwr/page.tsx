@@ -38,18 +38,18 @@ export default function CWRExportsPage() {
       icon={FileText}
     >
       <Card padding="none" className="overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-[60vh] overflow-y-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/5">
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Filename</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Version</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Type</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Works</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Recipient</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Created</th>
-                <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Filename</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Version</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Type</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Works</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Recipient</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Created</th>
+                <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -58,7 +58,8 @@ export default function CWRExportsPage() {
                   key={exp.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="group hover:bg-white/[0.02] transition-colors"
+                  className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
+                  onClick={() => setViewingExport(exp)}
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -87,7 +88,7 @@ export default function CWRExportsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={() => setViewingExport(exp)}
+                        onClick={(e) => { e.stopPropagation(); setViewingExport(exp); }}
                         className="p-2 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-colors"
                         title="View Details"
                       >
@@ -95,7 +96,7 @@ export default function CWRExportsPage() {
                       </button>
                       {exp.status === 'draft' && (
                         <button
-                          onClick={() => handleMarkSent(exp.id)}
+                          onClick={(e) => { e.stopPropagation(); handleMarkSent(exp.id); }}
                           className="p-2 rounded-lg hover:bg-blue-500/10 text-zinc-500 hover:text-blue-400 transition-colors"
                           title="Mark as Sent"
                         >
@@ -104,7 +105,7 @@ export default function CWRExportsPage() {
                       )}
                       {exp.status === 'sent' && (
                         <button
-                          onClick={() => handleMarkAcknowledged(exp.id)}
+                          onClick={(e) => { e.stopPropagation(); handleMarkAcknowledged(exp.id); }}
                           className="p-2 rounded-lg hover:bg-emerald-500/10 text-zinc-500 hover:text-emerald-400 transition-colors"
                           title="Mark as Acknowledged"
                         >

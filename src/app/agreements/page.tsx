@@ -22,9 +22,9 @@ export default function AgreementsPage() {
   );
 
   const handleDelete = (id: string) => {
-    if (confirm('Delete this agreement?')) {
+    if (confirm('Archive this agreement?')) {
       deleteAgreement(id);
-      addToast({ type: 'success', title: 'Agreement deleted' });
+      addToast({ type: 'success', title: 'Agreement archived' });
     }
   };
 
@@ -66,18 +66,18 @@ export default function AgreementsPage() {
       </Card>
 
       <Card padding="none" className="overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-[60vh] overflow-y-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/5">
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Agreement</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Type</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Writer</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Publisher</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Admin Fee</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Start Date</th>
-                <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Agreement</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Type</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Writer</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Publisher</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Admin Fee</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Start Date</th>
+                <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -86,7 +86,8 @@ export default function AgreementsPage() {
                   key={agreement.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="group hover:bg-white/[0.02] transition-colors"
+                  className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
+                  onClick={() => { setEditingAgreement(agreement); setShowModal(true); }}
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -128,13 +129,14 @@ export default function AgreementsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={() => { setEditingAgreement(agreement); setShowModal(true); }}
+                        onClick={(e) => { e.stopPropagation(); setEditingAgreement(agreement); setShowModal(true); }}
                         className="p-2 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-colors"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(agreement.id)}
+                        title="Archive"
+                        onClick={(e) => { e.stopPropagation(); handleDelete(agreement.id); }}
                         className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-500 hover:text-red-400 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />

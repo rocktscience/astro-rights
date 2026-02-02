@@ -4,10 +4,8 @@ import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter, useParams } from 'next/navigation';
 import { useStore } from '@/store';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { ToastContainer } from '@/components/ui/Toast';
+import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, Badge, Button, Input, Select } from '@/components/ui/index';
-import { motion } from 'framer-motion';
 import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react';
 import type { WriterShare, PublisherShare, VersionType, Work, WriterCapacity, PublisherRole } from '@/types';
 
@@ -109,20 +107,18 @@ export default function EditWorkPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <Sidebar />
-      <ToastContainer />
-
-      <main className="transition-all duration-300" style={{ marginLeft: sidebarCollapsed ? 72 : 256 }}>
-        <div className="p-8 max-w-4xl">
-          <div className="flex items-center gap-4 mb-8">
-            <Button variant="ghost" onClick={() => router.back()}><ArrowLeft className="w-5 h-5" /></Button>
-            <div>
-              <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-bold text-zinc-900 dark:text-white">Edit Work</motion.h1>
-              <p className="text-zinc-500">{work.workId}</p>
-            </div>
-          </div>
-
+    <PageLayout
+      title="Edit Work"
+      description={work.workId}
+      actions={
+        <>
+          <Button variant="ghost" onClick={() => router.back()}><ArrowLeft className="w-4 h-4" /></Button>
+          <Button variant="secondary" onClick={() => router.back()}>Cancel</Button>
+          <Button onClick={handleSave} leftIcon={<Save className="w-4 h-4" />}>Save Changes</Button>
+        </>
+      }
+    >
+      <div className="p-8 max-w-4xl">
           <Card className="p-6 mb-6">
             <h3 className="font-semibold text-zinc-900 dark:text-white mb-4">Basic Information</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -197,7 +193,6 @@ export default function EditWorkPage() {
             <Button onClick={handleSave} leftIcon={<Save className="w-4 h-4" />}>Save Changes</Button>
           </div>
         </div>
-      </main>
-    </div>
+    </PageLayout>
   );
 }

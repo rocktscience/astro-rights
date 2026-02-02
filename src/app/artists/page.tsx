@@ -30,9 +30,9 @@ export default function ArtistsPage() {
   );
 
   const handleDelete = (id: string) => {
-    if (confirm('Delete this artist?')) {
+    if (confirm('Archive this artist?')) {
       deleteArtist(id);
-      addToast({ type: 'success', title: 'Artist deleted' });
+      addToast({ type: 'success', title: 'Artist archived' });
     }
   };
 
@@ -62,15 +62,15 @@ export default function ArtistsPage() {
       </Card>
 
       <Card padding="none" className="overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-[60vh] overflow-y-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/5">
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">ISNI</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">IPN</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Created</th>
-                <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Name</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">ISNI</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">IPN</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Created</th>
+                <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider sticky top-0 bg-zinc-900/80 dark:bg-zinc-950/80 z-10">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -79,7 +79,8 @@ export default function ArtistsPage() {
                   key={artist.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="group hover:bg-white/[0.02] transition-colors"
+                  className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
+                  onClick={() => { setEditingArtist(artist); setShowModal(true); }}
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -99,13 +100,14 @@ export default function ArtistsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={() => { setEditingArtist(artist); setShowModal(true); }}
+                        onClick={(e) => { e.stopPropagation(); setEditingArtist(artist); setShowModal(true); }}
                         className="p-2 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-colors"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(artist.id)}
+                        title="Archive"
+                        onClick={(e) => { e.stopPropagation(); handleDelete(artist.id); }}
                         className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-500 hover:text-red-400 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />

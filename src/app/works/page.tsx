@@ -108,16 +108,16 @@ export default function WorksPage() {
   };
 
   const handleDeleteSelected = () => {
-    if (confirm(`Delete ${selectedWorkIds.length} works?`)) {
+    if (confirm(`Archive ${selectedWorkIds.length} works?`)) {
       selectedWorkIds.forEach((id) => deleteWork(id));
       addToast({
         type: 'success',
-        title: 'Works deleted',
-        message: `${selectedWorkIds.length} works have been deleted.`,
+        title: 'Works archived',
+        message: `${selectedWorkIds.length} works have been archived.`,
       });
       clearWorkSelection();
     }
-  };
+  }; 
 
   const handleGenerateCWR = () => {
     if (selectedWorkIds.length === 0) {
@@ -181,7 +181,7 @@ export default function WorksPage() {
                     Clear ({selectedWorkIds.length})
                   </Button>
                   <Button variant="secondary" onClick={handleDeleteSelected} leftIcon={<Trash2 className="w-4 h-4" />}>
-                    Delete
+                    Archive
                   </Button>
                   <Button onClick={handleGenerateCWR} leftIcon={<FileText className="w-4 h-4" />} glow>
                     Generate CWR
