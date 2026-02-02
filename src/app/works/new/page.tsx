@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/store';
 import { Sidebar } from '@/components/layout/Sidebar';
@@ -22,11 +23,11 @@ export default function NewWorkPage() {
   const [publisherShares, setPublisherShares] = useState<Partial<PublisherShare>[]>([]);
 
   const addWriterShare = () => {
-    setWriterShares([...writerShares, { writerId: '', capacity: 'CA', prOwnership: 0, mrOwnership: 0, srOwnership: 0 }]);
+    setWriterShares([...writerShares, { id: uuidv4(), writerId: '', capacity: 'CA', prOwnership: 0, mrOwnership: 0, srOwnership: 0 }]);
   };
 
   const addPublisherShare = () => {
-    setPublisherShares([...publisherShares, { publisherId: '', role: 'E', prOwnership: 100, mrOwnership: 100, srOwnership: 100, prCollection: 0, mrCollection: 0, srCollection: 0, territories: [{ code: '2136', name: 'World', included: true }] }]);
+    setPublisherShares([...publisherShares, { id: uuidv4(), publisherId: '', role: 'E', prOwnership: 100, mrOwnership: 100, srOwnership: 100, prCollection: 0, mrCollection: 0, srCollection: 0, territories: [{ code: '2136', name: 'World', included: true }] }]);
   };
 
   const updateWriterShare = (index: number, field: string, value: any) => {
@@ -116,7 +117,7 @@ export default function NewWorkPage() {
             ) : (
               <div className="space-y-4">
                 {writerShares.map((share, idx) => (
-                  <div key={idx} className="p-4 border border-zinc-200 dark:border-zinc-700 rounded-lg">
+                  <div key={(share as any).id ?? idx} className="p-4 border border-zinc-200 dark:border-zinc-700 rounded-lg">
                     <div className="grid grid-cols-6 gap-3">
                       <div className="col-span-2">
                         <Select label="Writer" options={[{ value: '', label: 'Select...' }, ...writers.map(w => ({ value: w.id, label: `${w.firstName} ${w.lastName}` }))]} value={share.writerId || ''} onChange={(e) => updateWriterShare(idx, 'writerId', e.target.value)} />
@@ -144,7 +145,7 @@ export default function NewWorkPage() {
             ) : (
               <div className="space-y-4">
                 {publisherShares.map((share, idx) => (
-                  <div key={idx} className="p-4 border border-zinc-200 dark:border-zinc-700 rounded-lg">
+                  <div key={(share as any).id ?? idx} className="p-4 border border-zinc-200 dark:border-zinc-700 rounded-lg">
                     <div className="grid grid-cols-6 gap-3">
                       <div className="col-span-2">
                         <Select label="Publisher" options={[{ value: '', label: 'Select...' }, ...publishers.map(p => ({ value: p.id, label: p.name }))]} value={share.publisherId || ''} onChange={(e) => updatePublisherShare(idx, 'publisherId', e.target.value)} />

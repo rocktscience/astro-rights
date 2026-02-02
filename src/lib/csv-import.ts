@@ -81,8 +81,9 @@ function parseCSVLine(line: string): string[] {
   return result;
 }
 
-function parseBoolean(value: string): boolean {
-  const lower = value.toLowerCase().trim();
+function parseBoolean(value?: string): boolean {
+  if (!value) return false;
+  const lower = value.toString().toLowerCase().trim();
   return lower === 'yes' || lower === 'true' || lower === 'checked' || lower === '1';
 }
 

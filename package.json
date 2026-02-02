@@ -8,7 +8,8 @@
     "dev:webpack": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -34,10 +35,11 @@
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
-    "@types/node": "^20.11.30",
+    "@types/node": "^20.19.30",
     "@types/papaparse": "^5.5.2",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
-    "@types/uuid": "^9.0.8"
+    "@types/uuid": "^9.0.8",
+    "vitest": "^4.0.18"
   }
 }
