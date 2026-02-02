@@ -179,21 +179,28 @@ export default function AgreementsPage() {
               termEndDate: (form.elements.namedItem('termEndDate') as HTMLInputElement).value ? new Date((form.elements.namedItem('termEndDate') as HTMLInputElement).value) : undefined,
               territories: editingAgreement?.territories || [],
             }; 
-            const dataWithDefaults = {
-              // Required-by-store fields (draft-safe defaults)
-              agreementId: (data as any).agreementId ?? data.agreementNumber ?? '',
-              agreementTerritoryIds: (data as any).agreementTerritoryIds ?? [],
-              agreementPartyIds: (data as any).agreementPartyIds ?? [],
-              workIds: (data as any).workIds ?? [],
-              releaseIds: (data as any).releaseIds ?? [],
-              numberOfWorks: (data as any).numberOfWorks ?? 0,
-              ...data,
+            type AgreementFormExtras = {
+              agreementTerritoryIds?: string[];
+              agreementPartyIds?: string[];
+              workIds?: string[];
+              releaseIds?: string[];
+              numberOfWorks?: number;
             };
+            const agreementPayload = ({
+              // Required-by-store fields (draft-safe defaults)
+              agreementId: data.agreementNumber ?? '',
+              agreementTerritoryIds: (data as AgreementFormExtras).agreementTerritoryIds ?? [],
+              agreementPartyIds: (data as AgreementFormExtras).agreementPartyIds ?? [],
+              workIds: (data as AgreementFormExtras).workIds ?? [],
+              releaseIds: (data as AgreementFormExtras).releaseIds ?? [],
+              numberOfWorks: (data as AgreementFormExtras).numberOfWorks ?? 0,
+              ...data,
+            } as unknown) as Omit<Agreement, 'id' | 'createdAt' | 'updatedAt'>;
             if (editingAgreement) {
               updateAgreement(editingAgreement.id, data);
               addToast({ type: 'success', title: 'Agreement updated' });
             } else {
-              addAgreement(dataWithDefaults as any);
+              addAgreement(agreementPayload);
               addToast({ type: 'success', title: 'Agreement added' });
             }
             setShowModal(false);

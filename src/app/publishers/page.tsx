@@ -154,7 +154,8 @@ export default function PublishersPage() {
               updatePublisher(editingPublisher.id, data);
               addToast({ type: 'success', title: 'Publisher updated' });
             } else {
-              addPublisher(dataWithDefaults as any);
+              const payload: Omit<Publisher, 'id' | 'createdAt' | 'updatedAt'> = dataWithDefaults as Omit<Publisher, 'id' | 'createdAt' | 'updatedAt'>;
+              addPublisher(payload);
               addToast({ type: 'success', title: 'Publisher added' });
             }
             setShowModal(false);
