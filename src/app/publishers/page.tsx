@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useStore } from '@/store';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, Badge, Button, Input, Modal, Select, EmptyState } from '@/components/ui/index';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Building2, Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Building2, Plus, Search, Edit, Trash2, Upload } from 'lucide-react';
 import type { Publisher } from '@/types';
 import { formatDate } from '@/lib/utils';
 
@@ -34,9 +35,14 @@ export default function PublishersPage() {
       description={`Manage ${publishers.length} publishing entities`}
       icon={Building2}
       actions={
-        <Button onClick={() => { setEditingPublisher(null); setShowModal(true); }} leftIcon={<Plus className="w-4 h-4" />} glow>
-          Add Publisher
-        </Button>
+        <>
+          <Button onClick={() => { setEditingPublisher(null); setShowModal(true); }} leftIcon={<Plus className="w-4 h-4" />} glow>
+            Add Publisher
+          </Button>
+          <Link href="/import">
+            <Button variant="ghost" leftIcon={<Upload className="w-4 h-4" />}>Import</Button>
+          </Link>
+        </>
       }
     >
       <Card className="p-5 mb-6">

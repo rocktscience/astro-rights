@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useStore } from '@/store';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, Badge, Button, Modal, EmptyState, StatCard } from '@/components/ui/index';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { DollarSign, Eye, Download, TrendingUp, Calendar, FileText } from 'lucide-react';
+import { DollarSign, Eye, Download, TrendingUp, Calendar, FileText, Upload } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import {
   AreaChart,
@@ -36,6 +37,11 @@ export default function RoyaltiesPage() {
       title="Royalties"
       description={`${royaltyStatements.length} royalty statements processed`}
       icon={DollarSign}
+      actions={
+        <Link href="/import">
+          <Button variant="ghost" leftIcon={<Upload className="w-4 h-4" />}>Import</Button>
+        </Link>
+      }
     >
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">

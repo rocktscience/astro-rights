@@ -136,6 +136,35 @@ export function truncate(str: string, length: number): string {
   return str.slice(0, length - 3) + '...';
 }
 
+// Generic sorter by key
+export function sortByKey<T extends Record<string, any>>(arr: T[], key: string, dir: 'asc' | 'desc' = 'asc'): T[] {
+  const copy = [...arr];
+  copy.sort((a, b) => {
+    const aVal = a[key];
+    const bVal = b[key];
+
+    // Handle dates
+    if (aVal instanceof Date || bVal instanceof Date) {
+      const aTime = aVal ? new Date(aVal).getTime() : 0;
+      const bTime = bVal ? new Date(bVal).getTime() : 0;
+      return dir === 'asc' ? aTime - bTime : bTime - aTime;
+    }
+
+    // Handle numbers
+    if (typeof aVal === 'number' || typeof bVal === 'number') {
+      const aNum = Number(aVal) || 0;
+      const bNum = Number(bVal) || 0;
+      return dir === 'asc' ? aNum - bNum : bNum - aNum;
+    }
+
+    // Fallback to string compare
+    const aStr = (aVal || '').toString();
+    const bStr = (bVal || '').toString();
+    return dir === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+  });
+  return copy;
+}
+
 // Deep clone object
 export function deepClone<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));

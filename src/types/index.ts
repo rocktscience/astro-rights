@@ -746,6 +746,14 @@ export interface AlternateTitle {
   workTitle?: string;
 }
 
+// ===== LYRICS =====
+export interface Lyric {
+  id: UUID;
+  language?: string;
+  content: string;
+  workId?: string;
+}
+
 // ===========================
 // RECORDING - EXPANDED
 // ===========================
@@ -977,6 +985,7 @@ export interface Work {
   
   // Alternate titles
   alternateTitles: AlternateTitle[];
+  lyrics?: Lyric[];
   
   // Related recordings
   recordings: Recording[];
