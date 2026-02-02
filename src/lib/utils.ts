@@ -141,6 +141,15 @@ export function deepClone<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 
+// Parse number or return undefined (preserve zero)
+export function parseNumberOrUndefined(value?: string | number): number | undefined {
+  if (value === undefined || value === null) return undefined;
+  const s = typeof value === 'number' ? value : value.toString().trim();
+  if (s === '') return undefined;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 // Debounce function
 export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
   func: T,
